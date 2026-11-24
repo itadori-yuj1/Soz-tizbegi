@@ -8,7 +8,7 @@
 - `src/server/BotAI.lua`: уровни бота (задержка + шанс не успеть)
 - `src/server/TableGame.lua`: партия: ходы, таймер, жизни, победа
 - `src/server/Main.server.lua`: Remotes, режим тренировки
-- `src/data/Words.lua`: словарь (625 слов, из вашего файла)
+- `src/data/Words.lua`: словарь (893 слова, из вашего файла)
 - `src/client/DebugClient.client.lua`: отладочный клиент (лог + поле ввода)
 
 ## Протокол (RemoteEvent'ы в ReplicatedStorage.SozRemotes)
