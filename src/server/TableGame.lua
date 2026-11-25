@@ -30,6 +30,7 @@ function TableGame.new(dict, seats, tableStateRemote)
 		running = false,
 		exhausted = false,
 		onEnd = nil,
+		onWord = nil,
 	}, TableGame)
 
 	-- Буква играбельна, если на неё достаточно слов в словаре и остались неиспользованные
@@ -45,7 +46,13 @@ end
 function TableGame:_snapshot()
 	local out = {}
 	for i, seat in self.seats do
-		out[i] = { name = seat.name, lives = seat.lives, alive = seat.alive, bot = seat.bot ~= nil }
+		out[i] = {
+			name = seat.name,
+			lives = seat.lives,
+			alive = seat.alive,
+			bot = seat.bot ~= nil,
+			userId = seat.player and seat.player.UserId or nil,
+		}
 	end
 	return out
 end
@@ -137,6 +144,9 @@ function TableGame:_accept(seat, word)
 	self.chain[#self.chain + 1] = word
 	self:_advanceLetter(word)
 	self:_broadcast({ type = "word", by = seat.name, word = word, nextLetter = self.letter })
+	if self.onWord then
+		self.onWord(word)
+	end
 end
 
 -- Вызывается из RemoteEvent SubmitWord (игрок -> сервер)
@@ -217,6 +227,7 @@ function TableGame:_playTurn(seat)
 	self:_broadcast({
 		type = "turn",
 		who = seat.name,
+		whoId = seat.player and seat.player.UserId or nil,
 		letter = self.letter,
 		deadline = self.deadline, -- в workspace:GetServerTimeNow(): клиент считает остаток сам
 		turnTime = turnTime,
@@ -261,6 +272,9 @@ function TableGame:run()
 	self.chain[1] = startWord
 	self:_advanceLetter(startWord)
 	self:_broadcast({ type = "start", startWord = startWord, seats = self:_snapshot() })
+	if self.onWord then
+		self.onWord(startWord)
+	end
 	task.wait(1)
 
 	local idx = 0

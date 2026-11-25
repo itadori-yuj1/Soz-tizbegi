@@ -114,6 +114,21 @@ function HUD.new(gui)
 	}, root)
 	corner(self._toast, 0.3)
 
+	-- Баннер ожидания (виден и вне партии)
+	self._banner = make("TextLabel", {
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.fromScale(0.5, 0.04),
+		Size = UDim2.fromScale(0.7, 0.09),
+		BackgroundColor3 = Color3.fromRGB(28, 28, 36),
+		BackgroundTransparency = 0.2,
+		TextColor3 = Color3.fromRGB(255, 200, 60),
+		Font = FONT,
+		TextScaled = true,
+		Text = "",
+		Visible = false,
+	}, gui)
+	corner(self._banner, 0.25)
+
 	self._conn = RunService.RenderStepped:Connect(function()
 		self:_tick()
 	end)
@@ -241,6 +256,11 @@ function HUD:onEliminated(who)
 	self:setSeats(self._seats)
 end
 
+function HUD:setBanner(text)
+	self._banner.Visible = text ~= nil
+	self._banner.Text = text or ""
+end
+
 function HUD:toast(text)
 	self._toastToken += 1
 	local token = self._toastToken
@@ -258,7 +278,7 @@ end
 
 -- ===== меню и результат =====
 
-function HUD:showMenu(onPick)
+function HUD:showMenu(onPick, onBack)
 	self:hideOverlay()
 	self.root.Visible = false
 	local menu = make("Frame", {
@@ -304,9 +324,23 @@ function HUD:showMenu(onPick)
 			onPick(lv[1])
 		end)
 	end
+	if onBack then
+		local back = make("TextButton", {
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.fromScale(0.5, 0.91),
+			Size = UDim2.fromScale(0.3, 0.08),
+			BackgroundColor3 = Color3.fromRGB(70, 74, 92),
+			TextColor3 = WHITE,
+			Font = FONT,
+			TextScaled = true,
+			Text = "Артқа",
+		}, menu)
+		corner(back, 0.2)
+		back.Activated:Connect(onBack)
+	end
 end
 
-function HUD:showEnd(won, winnerName, onAgain, onMenu)
+function HUD:showEnd(won, winnerName, buttons)
 	self:hideOverlay()
 	self:_stopTimer()
 	local o = make("Frame", {
@@ -356,8 +390,9 @@ function HUD:showEnd(won, winnerName, onAgain, onMenu)
 		corner(b, 0.2)
 		b.Activated:Connect(cb)
 	end
-	button(0.5, "Қайта ойнау", Color3.fromRGB(50, 110, 200), onAgain)
-	button(0.69, "Мәзір", Color3.fromRGB(70, 74, 92), onMenu)
+	for i, b in buttons do
+		button(0.5 + (i - 1) * 0.19, b.text, b.color, b.cb)
+	end
 end
 
 function HUD:hideOverlay()

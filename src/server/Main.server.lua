@@ -7,6 +7,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local Dictionary = require(script.Parent.Dictionary)
 local TableGame = require(script.Parent.TableGame)
+local TableService = require(script.Parent.TableService)
 local Bot = require(script.Parent.BotAI)
 
 -- Remotes
@@ -30,7 +31,8 @@ local dict = Dictionary.new(ServerStorage:WaitForChild("WordData"))
 print(("[Сөз Тізбегі] слов в словаре: %d"):format(dict.total))
 
 -- Партии
-local gameOf = {} -- [Player] = TableGame
+local gameOf = {} -- [Player] = TableGame (и тренировочные, и за столами)
+local tables = TableService.new(dict, tableState, gameOf)
 
 -- Простейший лимит: не больше 6 отправок слова в секунду
 local submitLog = {}
@@ -53,7 +55,7 @@ submitWord.OnServerEvent:Connect(function(player, text)
 end)
 
 joinPractice.OnServerEvent:Connect(function(player, level, botCount)
-	if gameOf[player] then
+	if gameOf[player] or tables:isSeated(player) then
 		return
 	end
 	if type(level) ~= "string" or not Bot.LEVELS[level] then
