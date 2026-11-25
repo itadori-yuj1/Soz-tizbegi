@@ -9,7 +9,8 @@
 - `src/server/TableGame.lua`: партия: ходы, таймер, жизни, победа
 - `src/server/Main.server.lua`: Remotes, режим тренировки
 - `src/data/Words.lua`: словарь (893 слова, из вашего файла)
-- `src/client/DebugClient.client.lua`: отладочный клиент (лог + поле ввода)
+- `src/client/Keyboard.lua`: экранная казахская клавиатура
+- `src/client/DebugClient.client.lua`: отладочный клиент (лог + клавиатура)
 
 ## Протокол (RemoteEvent'ы в ReplicatedStorage.SozRemotes)
 
